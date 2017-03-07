@@ -23,8 +23,8 @@ blobs = datasets.make_blobs(n_samples=n_samples, random_state=8)
 
 meanVectors = np.random.uniform(0.0,10.0,size=[n_classes,n_features])
 sigmaVectors = 4.0*np.ones([n_classes, n_features])
-cd = simulateModelData(n_features,n_classes,n_samples)
-cd.simulate( mu=meanVectors, sigma=sigmaVectors)
+cd = simulateModelData(n_features,n_samples)
+cd.simulateClass(n_classes, mu=meanVectors, sigma=sigmaVectors)
 normalClusters = (cd.X, cd.y)
 
 no_structure = np.random.rand(n_samples, 2), None
@@ -72,8 +72,8 @@ for dataset in datasets:
     plot_num += 1
 
     if XNew.shape[1] > 2:
-        cd1 = simulateModelData(n_features,n_classes,10)
-        cd1.simulate( mu=meanVectors, sigma=sigmaVectors)
+        cd1 = simulateModelData(n_features,10)
+        cd1.simulateClass(n_classes, mu=meanVectors, sigma=sigmaVectors)
  
         y1 = clf.predict(ss.transform(cd1.X))
         p = StandardScaler().fit_transform(np.dot(cd1.X,V.transpose()))

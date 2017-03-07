@@ -16,10 +16,10 @@ def chooseBootstrapSamples(cd, trainingPerc):
     perm = np.random.permutation(tot)
     iTrain = perm[0:nTrain]
     iValidate = perm[nTrain:tot]
-    train = simulateModelData(cd.numFeatures, cd.numClasses, nTrain)
+    train = simulateModelData(cd.numFeatures, nTrain)
     train.X = cd.X[iTrain,:]
     train.y = cd.y[iTrain]
-    validate = simulateModelData(cd.numFeatures, cd.numClasses, nValidate)
+    validate = simulateModelData(cd.numFeatures, nValidate)
     validate.X = cd.X[iValidate,:]
     validate.y = cd.y[iValidate]
     return (train, validate)
@@ -28,14 +28,15 @@ if __name__ == '__main__':
     n_samples = 500
     n_features = 2
     n_classes = 4
+    n_iterations = 1000
     meanVectors = np.random.uniform(0.0,10.0,size=[n_classes,n_features])
     sigmaVectors = 2.0*np.ones([n_classes, n_features])
-    cd = simulateModelData(n_features,n_classes,n_samples)
-    cd.simulate( mu=meanVectors, sigma=sigmaVectors)
+    cd = simulateModelData(n_features,n_samples)
+    cd.simulateClass(n_classes, mu=meanVectors, sigma=sigmaVectors)
     trainingPerc = 0.8
     
-    results = np.zeros(1000)
-    for i in range(0,1000):
+    results = np.zeros(n_iterations)
+    for i in range(0,n_iterations):
         (train, validate) = chooseBootstrapSamples(cd, trainingPerc)
         ss = StandardScaler()
         ss.fit(train.X)
@@ -51,14 +52,26 @@ if __name__ == '__main__':
         
     print results[99]
     print np.average(results)    
+    plt.subplots_adjust(left=.1, right=.98, bottom=.10, top=.95, hspace=.99)
+
     plt.subplot(411)
     plt.hist(results)
+    plt.title('Accuracy for ' + str(n_iterations) + ' iterations')
+    plt.xlabel('Classification accuracy')
+    plt.text(min(results) + .01, 250, r'Average percent: %s' % str(np.average(results)) )
+    
     plt.subplot(412)
     plt.scatter(train.X[:, 0], train.X[:, 1], color=colors[train.y].tolist(), s=10)
+    plt.title('Training Data')
+
     plt.subplot(413)
     plt.scatter(validate.X[:, 0], validate.X[:, 1], color=colors[validate.y].tolist(), s=10)
+    plt.title('Validation Data Actual - last iteration')
+    
     plt.subplot(414)
     plt.scatter(validate.X[:, 0], validate.X[:, 1], color=colors[y1].tolist(), s=10)
+    plt.title('Validation Data Predicted - last iteration')
+    plt.text(np.min(validate.X[:, 0]), np.max(validate.X[:, 1]), r'Accuracy: %s' % str(results[99]))
     plt.show()
     
     
