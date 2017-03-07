@@ -9,20 +9,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn import svm
 from SimulateModelData import simulateModelData
 
-def chooseBootstrapSamples(cd, trainingPerc):
-    tot = len(cd.y)
-    nTrain = int(np.round(trainingPerc*tot,0))
-    nValidate = tot - nTrain
-    perm = np.random.permutation(tot)
-    iTrain = perm[0:nTrain]
-    iValidate = perm[nTrain:tot]
-    train = simulateModelData(cd.numFeatures, nTrain)
-    train.X = cd.X[iTrain,:]
-    train.y = cd.y[iTrain]
-    validate = simulateModelData(cd.numFeatures, nValidate)
-    validate.X = cd.X[iValidate,:]
-    validate.y = cd.y[iValidate]
-    return (train, validate)
 
 if __name__ == '__main__':
     n_samples = 500
@@ -32,12 +18,12 @@ if __name__ == '__main__':
     meanVectors = np.random.uniform(0.0,10.0,size=[n_classes,n_features])
     sigmaVectors = 2.0*np.ones([n_classes, n_features])
     cd = simulateModelData(n_features,n_samples)
-    cd.simulateClass(n_classes, mu=meanVectors, sigma=sigmaVectors)
+    cd.simulateClassification(n_classes, mu=meanVectors, sigma=sigmaVectors)
     trainingPerc = 0.8
     
     results = np.zeros(n_iterations)
     for i in range(0,n_iterations):
-        (train, validate) = chooseBootstrapSamples(cd, trainingPerc)
+        (train, validate) = cd.chooseBootstrapSamples(trainingPerc)
         ss = StandardScaler()
         ss.fit(train.X)
         X = ss.transform(train.X)

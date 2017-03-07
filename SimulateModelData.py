@@ -23,7 +23,7 @@ class simulateModelData(object):
         self.theta = None
         return
     
-    def simulateClass(self, numClasses, mu=None, sigma=None):
+    def simulateClassification(self, numClasses, mu=None, sigma=None):
         self.numClasses = numClasses
         if mu is None:
             self.meanVectors = np.zeros([self.numClasses,self.numFeatures])
@@ -54,6 +54,22 @@ class simulateModelData(object):
         r2 = np.sum(np.multiply(self.X,self.X),axis=1)
         self.y = np.where(r2 < 1.0, 2.0-r2, 1.0/r2) + np.random.normal(0.0,sigma,size=[self.numSamples])
         return
+    
+    def chooseBootstrapSamples(self, trainingPerc):
+        tot = self.numSamples
+        nTrain = int(np.round(trainingPerc*tot,0))
+        nValidate = tot - nTrain
+        perm = np.random.permutation(tot)
+        iTrain = perm[0:nTrain]
+        iValidate = perm[nTrain:tot]
+        train = simulateModelData(self.numFeatures, nTrain)
+        train.X = self.X[iTrain,:]
+        train.y = self.y[iTrain]
+        validate = simulateModelData(self.numFeatures, nValidate)
+        validate.X = self.X[iValidate,:]
+        validate.y = self.y[iValidate]
+        return (train, validate)
+
         
 if __name__ == '__main__':
     if (False):
